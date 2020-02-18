@@ -5,7 +5,7 @@ import (
 	"flag"
 	"log"
 
-	"gost"
+	"gitlab.com/besha.net/gost-minimal"
 )
 
 var (

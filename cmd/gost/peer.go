@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"gost"
+	"gitlab.com/besha.net/gost-minimal"
 )
 
 type peerConfig struct {

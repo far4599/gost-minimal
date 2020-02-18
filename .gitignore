@@ -32,3 +32,5 @@ _testmain.go
 
 cmd/gost/gost
 snap
+
+.idea

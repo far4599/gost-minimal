@@ -11,7 +11,7 @@ import (
 	"os"
 	"strings"
 
-	"gost"
+	"gitlab.com/besha.net/gost-minimal"
 )
 
 var (

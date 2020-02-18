@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
+	"gitlab.com/besha.net/gost-minimal"
 	"golang.org/x/net/http2"
-	"gost"
 )
 
 var (

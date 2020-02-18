@@ -8,7 +8,7 @@ import (
 
 	"golang.org/x/net/http2"
 
-	"gost"
+	"gitlab.com/besha.net/gost-minimal"
 )
 
 var (

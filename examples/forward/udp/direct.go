@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"gost"
+	"gitlab.com/besha.net/gost-minimal"
 )
 
 var (
