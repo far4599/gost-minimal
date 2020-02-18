@@ -14,19 +14,19 @@ import (
 	"github.com/go-log/log"
 )
 
-type stringList []string
+type StringList []string
 
-func (l *stringList) String() string {
+func (l *StringList) String() string {
 	return fmt.Sprintf("%s", *l)
 }
-func (l *stringList) Set(value string) error {
+func (l *StringList) Set(value string) error {
 	*l = append(*l, value)
 	return nil
 }
 
 type Route struct {
-	ServeNodes stringList
-	ChainNodes stringList
+	ServeNodes StringList
+	ChainNodes StringList
 	Retries    int
 }
 
