@@ -1,4 +1,4 @@
-module gitlab.com/besha.net/gost-minimal
+module github.com/far4599/gost-minimal
 
 go 1.13
 

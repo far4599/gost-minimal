@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"gitlab.com/besha.net/gost-minimal"
+	"github.com/besha.net/gost-minimal"
 )
 
 func main() {

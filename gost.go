@@ -114,7 +114,7 @@ func generateKeyPair() (rawCert, rawKey []byte, err error) {
 	template := x509.Certificate{
 		SerialNumber: serialNumber,
 		Subject: pkix.Name{
-			Organization: []string{"gitlab.com/besha.net/gost-minimal"},
+			Organization: []string{"github.com/besha.net/gost-minimal"},
 		},
 		NotBefore: notBefore,
 		NotAfter:  notAfter,

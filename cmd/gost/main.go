@@ -12,7 +12,7 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/go-log/log"
-	"gitlab.com/besha.net/gost-minimal"
+	"github.com/besha.net/gost-minimal"
 )
 
 var (
