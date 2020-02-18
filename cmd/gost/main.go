@@ -11,13 +11,13 @@ import (
 
 	_ "net/http/pprof"
 
+	"github.com/far4599/gost-minimal"
 	"github.com/go-log/log"
-	"github.com/besha.net/gost-minimal"
 )
 
 var (
 	configureFile string
-	baseCfg       = &baseConfig{}
+	baseCfg       = &BaseConfig{}
 	pprofAddr     string
 	pprofEnabled  = os.Getenv("PROFILING") != ""
 )
@@ -29,13 +29,13 @@ func init() {
 		printVersion bool
 	)
 
-	flag.Var(&baseCfg.route.ChainNodes, "F", "forward address, can make a forward chain")
-	flag.Var(&baseCfg.route.ServeNodes, "L", "listen address, can listen on multiple ports (required)")
+	flag.Var(&baseCfg.Route.ChainNodes, "F", "forward address, can make a forward Chain")
+	flag.Var(&baseCfg.Route.ServeNodes, "L", "listen address, can listen on multiple ports (required)")
 	flag.StringVar(&configureFile, "C", "", "configure file")
 	flag.BoolVar(&baseCfg.Debug, "D", false, "enable debug log")
 	flag.BoolVar(&printVersion, "V", false, "print version")
 	if pprofEnabled {
-		flag.StringVar(&pprofAddr, "P", ":6060", "profiling HTTP server address")
+		flag.StringVar(&pprofAddr, "P", ":6060", "profiling HTTP Server address")
 	}
 	flag.Parse()
 
@@ -46,7 +46,7 @@ func init() {
 	}
 
 	if configureFile != "" {
-		_, err := parseBaseConfig(configureFile)
+		_, err := ParseBaseConfig(configureFile)
 		if err != nil {
 			log.Log(err)
 			os.Exit(1)
@@ -61,7 +61,7 @@ func init() {
 func main() {
 	if pprofEnabled {
 		go func() {
-			log.Log("profiling server on", pprofAddr)
+			log.Log("profiling Server on", pprofAddr)
 			log.Log(http.ListenAndServe(pprofAddr, nil))
 		}()
 	}
@@ -95,8 +95,8 @@ func main() {
 func start() error {
 	gost.Debug = baseCfg.Debug
 
-	var routers []router
-	rts, err := baseCfg.route.GenRouters()
+	var routers []Router
+	rts, err := baseCfg.Route.GenRouters()
 	if err != nil {
 		return err
 	}

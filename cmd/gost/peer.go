@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/besha.net/gost-minimal"
+	"github.com/far4599/gost-minimal"
 )
 
 type peerConfig struct {
@@ -59,7 +59,7 @@ func (cfg *peerConfig) Reload(r io.Reader) error {
 	gNodes := cfg.baseNodes
 	nid := len(gNodes) + 1
 	for _, s := range cfg.Nodes {
-		nodes, err := parseChainNode(s)
+		nodes, err := ParseChainNode(s)
 		if err != nil {
 			return err
 		}

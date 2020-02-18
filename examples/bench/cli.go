@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/besha.net/gost-minimal"
+	"github.com/far4599/gost-minimal"
 	"golang.org/x/net/http2"
 )
 

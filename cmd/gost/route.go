@@ -10,8 +10,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/far4599/gost-minimal"
 	"github.com/go-log/log"
-	"github.com/besha.net/gost-minimal"
 )
 
 type stringList []string
@@ -24,13 +24,13 @@ func (l *stringList) Set(value string) error {
 	return nil
 }
 
-type route struct {
+type Route struct {
 	ServeNodes stringList
 	ChainNodes stringList
 	Retries    int
 }
 
-func (r *route) parseChain() (*gost.Chain, error) {
+func (r *Route) ParseChain() (*gost.Chain, error) {
 	chain := gost.NewChain()
 	chain.Retries = r.Retries
 	gid := 1 // group ID
@@ -41,12 +41,12 @@ func (r *route) parseChain() (*gost.Chain, error) {
 		gid++
 
 		// parse the base nodes
-		nodes, err := parseChainNode(ns)
+		nodes, err := ParseChainNode(ns)
 		if err != nil {
 			return nil, err
 		}
 
-		nid := 1 // node ID
+		nid := 1 // Node ID
 		for i := range nodes {
 			nodes[i].ID = nid
 			nid++
@@ -85,7 +85,7 @@ func (r *route) parseChain() (*gost.Chain, error) {
 	return chain, nil
 }
 
-func parseChainNode(ns string) (nodes []gost.Node, err error) {
+func ParseChainNode(ns string) (nodes []gost.Node, err error) {
 	node, err := gost.ParseNode(ns)
 	if err != nil {
 		return
@@ -116,7 +116,7 @@ func parseChainNode(ns string) (nodes []gost.Node, err error) {
 
 	serverName, sport, _ := net.SplitHostPort(node.Addr)
 	if serverName == "" {
-		serverName = "localhost" // default server name
+		serverName = "localhost" // default Server name
 	}
 
 	rootCAs, err := loadCA(node.Get("ca"))
@@ -208,9 +208,9 @@ func parseChainNode(ns string) (nodes []gost.Node, err error) {
 	for _, ip := range ips {
 		nd := node.Clone()
 		nd.Addr = ip
-		// override the default node address
+		// override the default Node address
 		nd.HandshakeOptions = append(handshakeOptions, gost.AddrHandshakeOption(ip))
-		// One node per IP
+		// One Node per IP
 		nodes = append(nodes, nd)
 	}
 	if len(ips) == 0 {
@@ -221,13 +221,13 @@ func parseChainNode(ns string) (nodes []gost.Node, err error) {
 	return
 }
 
-func (r *route) GenRouters() ([]router, error) {
-	chain, err := r.parseChain()
+func (r *Route) GenRouters() ([]Router, error) {
+	chain, err := r.ParseChain()
 	if err != nil {
 		return nil, err
 	}
 
-	var rts []router
+	var rts []Router
 
 	for _, ns := range r.ServeNodes {
 		node, err := gost.ParseNode(ns)
@@ -351,7 +351,7 @@ func (r *route) GenRouters() ([]router, error) {
 		}
 
 		node.Bypass = parseBypass(node.Get("bypass"))
-		hosts := parseHosts(node.Get("hosts"))
+		hosts := parseHosts(node.Get("Hosts"))
 		ips := parseIP(node.Get("ip"), "")
 
 		resolver := parseResolver(node.Get("dns"))
@@ -388,13 +388,13 @@ func (r *route) GenRouters() ([]router, error) {
 			gost.TCPModeHandlerOption(node.GetBool("tcp")),
 		)
 
-		rt := router{
-			node:     node,
-			server:   &gost.Server{Listener: ln},
-			handler:  handler,
-			chain:    chain,
-			resolver: resolver,
-			hosts:    hosts,
+		rt := Router{
+			Node:     node,
+			Server:   &gost.Server{Listener: ln},
+			Handler:  handler,
+			Chain:    chain,
+			Resolver: resolver,
+			Hosts:    hosts,
 		}
 		rts = append(rts, rt)
 	}
@@ -402,23 +402,23 @@ func (r *route) GenRouters() ([]router, error) {
 	return rts, nil
 }
 
-type router struct {
-	node     gost.Node
-	server   *gost.Server
-	handler  gost.Handler
-	chain    *gost.Chain
-	resolver gost.Resolver
-	hosts    *gost.Hosts
+type Router struct {
+	Node     gost.Node
+	Server   *gost.Server
+	Handler  gost.Handler
+	Chain    *gost.Chain
+	Resolver gost.Resolver
+	Hosts    *gost.Hosts
 }
 
-func (r *router) Serve() error {
-	log.Logf("%s on %s", r.node.String(), r.server.Addr())
-	return r.server.Serve(r.handler)
+func (r *Router) Serve() error {
+	log.Logf("%s on %s", r.Node.String(), r.Server.Addr())
+	return r.Server.Serve(r.Handler)
 }
 
-func (r *router) Close() error {
-	if r == nil || r.server == nil {
+func (r *Router) Close() error {
+	if r == nil || r.Server == nil {
 		return nil
 	}
-	return r.server.Close()
+	return r.Server.Close()
 }

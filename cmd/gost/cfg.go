@@ -11,20 +11,20 @@ import (
 	"os"
 	"strings"
 
-	"github.com/besha.net/gost-minimal"
+	"github.com/far4599/gost-minimal"
 )
 
 var (
-	routers []router
+	Routers []Router
 )
 
-type baseConfig struct {
-	route
-	Routes []route
+type BaseConfig struct {
+	Route
+	Routes []Route
 	Debug  bool
 }
 
-func parseBaseConfig(s string) (*baseConfig, error) {
+func ParseBaseConfig(s string) (*BaseConfig, error) {
 	file, err := os.Open(s)
 	if err != nil {
 		return nil, err
@@ -206,7 +206,7 @@ func parseResolver(cfg string) gost.Resolver {
 				if u == nil || u.Scheme == "" {
 					continue
 				}
-				if u.Scheme == "https-chain" {
+				if u.Scheme == "https-Chain" {
 					p = u.Scheme
 				}
 				ns := gost.NameServer{

@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"log"
 
-	"github.com/besha.net/gost-minimal"
+	"github.com/far4599/gost-minimal"
 )
 
 func main() {
