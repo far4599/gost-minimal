@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"bufio"
@@ -24,7 +24,7 @@ type BaseConfig struct {
 	Debug  bool
 }
 
-func ParseBaseConfig(s string) (*BaseConfig, error) {
+func ParseBaseConfig(s string, baseCfg *BaseConfig) (*BaseConfig, error) {
 	file, err := os.Open(s)
 	if err != nil {
 		return nil, err
@@ -39,14 +39,14 @@ func ParseBaseConfig(s string) (*BaseConfig, error) {
 }
 
 var (
-	defaultCertFile = "cert.pem"
-	defaultKeyFile  = "key.pem"
+	DefaultCertFile = "cert.pem"
+	DefaultKeyFile  = "key.pem"
 )
 
 // Load the certificate from cert and key files, will use the default certificate if the provided info are invalid.
-func tlsConfig(certFile, keyFile string) (*tls.Config, error) {
+func TlsConfig(certFile, keyFile string) (*tls.Config, error) {
 	if certFile == "" || keyFile == "" {
-		certFile, keyFile = defaultCertFile, defaultKeyFile
+		certFile, keyFile = DefaultCertFile, DefaultKeyFile
 	}
 
 	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
@@ -56,7 +56,7 @@ func tlsConfig(certFile, keyFile string) (*tls.Config, error) {
 	return &tls.Config{Certificates: []tls.Certificate{cert}}, nil
 }
 
-func loadCA(caFile string) (cp *x509.CertPool, err error) {
+func LoadCA(caFile string) (cp *x509.CertPool, err error) {
 	if caFile == "" {
 		return
 	}
@@ -71,7 +71,7 @@ func loadCA(caFile string) (cp *x509.CertPool, err error) {
 	return
 }
 
-func parseUsers(authFile string) (users []*url.Userinfo, err error) {
+func ParseUsers(authFile string) (users []*url.Userinfo, err error) {
 	if authFile == "" {
 		return
 	}
@@ -99,7 +99,7 @@ func parseUsers(authFile string) (users []*url.Userinfo, err error) {
 	return
 }
 
-func parseAuthenticator(s string) (gost.Authenticator, error) {
+func ParseAuthenticator(s string) (gost.Authenticator, error) {
 	if s == "" {
 		return nil, nil
 	}
@@ -117,7 +117,7 @@ func parseAuthenticator(s string) (gost.Authenticator, error) {
 	return au, nil
 }
 
-func parseIP(s string, port string) (ips []string) {
+func ParseIP(s string, port string) (ips []string) {
 	if s == "" {
 		return
 	}
@@ -156,7 +156,7 @@ func parseIP(s string, port string) (ips []string) {
 	return
 }
 
-func parseBypass(s string) *gost.Bypass {
+func ParseBypass(s string) *gost.Bypass {
 	if s == "" {
 		return nil
 	}
@@ -187,7 +187,7 @@ func parseBypass(s string) *gost.Bypass {
 	return bp
 }
 
-func parseResolver(cfg string) gost.Resolver {
+func ParseResolver(cfg string) gost.Resolver {
 	if cfg == "" {
 		return nil
 	}
@@ -244,7 +244,7 @@ func parseResolver(cfg string) gost.Resolver {
 	return resolver
 }
 
-func parseHosts(s string) *gost.Hosts {
+func ParseHosts(s string) *gost.Hosts {
 	f, err := os.Open(s)
 	if err != nil {
 		return nil

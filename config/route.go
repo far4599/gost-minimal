@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"crypto/sha256"
@@ -33,7 +33,7 @@ type Route struct {
 func (r *Route) ParseChain() (*gost.Chain, error) {
 	chain := gost.NewChain()
 	chain.Retries = r.Retries
-	gid := 1 // group ID
+	gid := 1 // Group ID
 
 	for _, ns := range r.ChainNodes {
 		ngroup := gost.NewNodeGroup()
@@ -71,8 +71,8 @@ func (r *Route) ParseChain() (*gost.Chain, error) {
 			}
 
 			peerCfg := newPeerConfig()
-			peerCfg.group = ngroup
-			peerCfg.baseNodes = nodes
+			peerCfg.Group = ngroup
+			peerCfg.BaseNodes = nodes
 			peerCfg.Reload(f)
 			f.Close()
 
@@ -105,7 +105,7 @@ func ParseChainNode(ns string) (nodes []gost.Node, err error) {
 		}
 	}
 	if node.User == nil {
-		users, err := parseUsers(node.Get("secrets"))
+		users, err := ParseUsers(node.Get("secrets"))
 		if err != nil {
 			return nil, err
 		}
@@ -119,7 +119,7 @@ func ParseChainNode(ns string) (nodes []gost.Node, err error) {
 		serverName = "localhost" // default Server name
 	}
 
-	rootCAs, err := loadCA(node.Get("ca"))
+	rootCAs, err := LoadCA(node.Get("ca"))
 	if err != nil {
 		return
 	}
@@ -202,9 +202,9 @@ func ParseChainNode(ns string) (nodes []gost.Node, err error) {
 		Transporter: tr,
 	}
 
-	node.Bypass = parseBypass(node.Get("bypass"))
+	node.Bypass = ParseBypass(node.Get("bypass"))
 
-	ips := parseIP(node.Get("ip"), sport)
+	ips := ParseIP(node.Get("ip"), sport)
 	for _, ip := range ips {
 		nd := node.Clone()
 		nd.Addr = ip
@@ -248,7 +248,7 @@ func (r *Route) GenRouters() ([]Router, error) {
 				node.User = url.UserPassword(cs[:s], cs[s+1:])
 			}
 		}
-		authenticator, err := parseAuthenticator(node.Get("secrets"))
+		authenticator, err := ParseAuthenticator(node.Get("secrets"))
 		if err != nil {
 			return nil, err
 		}
@@ -258,12 +258,12 @@ func (r *Route) GenRouters() ([]Router, error) {
 			authenticator = gost.NewLocalAuthenticator(kvs)
 		}
 		if node.User == nil {
-			if users, _ := parseUsers(node.Get("secrets")); len(users) > 0 {
+			if users, _ := ParseUsers(node.Get("secrets")); len(users) > 0 {
 				node.User = users[0]
 			}
 		}
 		certFile, keyFile := node.Get("cert"), node.Get("key")
-		tlsCfg, err := tlsConfig(certFile, keyFile)
+		tlsCfg, err := TlsConfig(certFile, keyFile)
 		if err != nil && certFile != "" && keyFile != "" {
 			return nil, err
 		}
@@ -350,11 +350,11 @@ func (r *Route) GenRouters() ([]Router, error) {
 			}
 		}
 
-		node.Bypass = parseBypass(node.Get("bypass"))
-		hosts := parseHosts(node.Get("Hosts"))
-		ips := parseIP(node.Get("ip"), "")
+		node.Bypass = ParseBypass(node.Get("bypass"))
+		hosts := ParseHosts(node.Get("Hosts"))
+		ips := ParseIP(node.Get("ip"), "")
 
-		resolver := parseResolver(node.Get("dns"))
+		resolver := ParseResolver(node.Get("dns"))
 		if resolver != nil {
 			resolver.Init(
 				gost.ChainResolverOption(chain),

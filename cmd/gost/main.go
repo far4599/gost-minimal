@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/far4599/gost-minimal/config"
 	"net/http"
 	"os"
 	"runtime"
@@ -17,7 +18,7 @@ import (
 
 var (
 	configureFile string
-	baseCfg       = &BaseConfig{}
+	baseCfg       = &config.BaseConfig{}
 	pprofAddr     string
 	pprofEnabled  = os.Getenv("PROFILING") != ""
 )
@@ -46,7 +47,7 @@ func init() {
 	}
 
 	if configureFile != "" {
-		_, err := ParseBaseConfig(configureFile)
+		_, err := config.ParseBaseConfig(configureFile, baseCfg)
 		if err != nil {
 			log.Log(err)
 			os.Exit(1)
@@ -67,7 +68,7 @@ func main() {
 	}
 
 	// NOTE: as of 2.6, you can use custom cert/key files to initialize the default certificate.
-	tlsConfig, err := tlsConfig(defaultCertFile, defaultKeyFile)
+	tlsConfig, err := config.TlsConfig(config.DefaultCertFile, config.DefaultKeyFile)
 	if err != nil {
 		// generate random self-signed certificate.
 		cert, err := gost.GenCertificate()
@@ -95,7 +96,7 @@ func main() {
 func start() error {
 	gost.Debug = baseCfg.Debug
 
-	var routers []Router
+	var routers []config.Router
 	rts, err := baseCfg.Route.GenRouters()
 	if err != nil {
 		return err

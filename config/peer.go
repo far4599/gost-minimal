@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"bufio"
@@ -13,27 +13,27 @@ import (
 	"github.com/far4599/gost-minimal"
 )
 
-type peerConfig struct {
+type PeerConfig struct {
 	Strategy    string `json:"strategy"`
 	MaxFails    int    `json:"max_fails"`
 	FailTimeout time.Duration
-	period      time.Duration // the period for live reloading
+	PeriodF     time.Duration // the PeriodF for live reloading
 	Nodes       []string      `json:"nodes"`
-	group       *gost.NodeGroup
-	baseNodes   []gost.Node
-	stopped     chan struct{}
+	Group       *gost.NodeGroup
+	BaseNodes   []gost.Node
+	StoppedF    chan struct{}
 }
 
-func newPeerConfig() *peerConfig {
-	return &peerConfig{
-		stopped: make(chan struct{}),
+func newPeerConfig() *PeerConfig {
+	return &PeerConfig{
+		StoppedF: make(chan struct{}),
 	}
 }
 
-func (cfg *peerConfig) Validate() {
+func (cfg *PeerConfig) Validate() {
 }
 
-func (cfg *peerConfig) Reload(r io.Reader) error {
+func (cfg *PeerConfig) Reload(r io.Reader) error {
 	if cfg.Stopped() {
 		return nil
 	}
@@ -43,7 +43,7 @@ func (cfg *peerConfig) Reload(r io.Reader) error {
 	}
 	cfg.Validate()
 
-	group := cfg.group
+	group := cfg.Group
 	group.SetSelector(
 		nil,
 		gost.WithFilter(
@@ -56,7 +56,7 @@ func (cfg *peerConfig) Reload(r io.Reader) error {
 		gost.WithStrategy(gost.NewStrategy(cfg.Strategy)),
 	)
 
-	gNodes := cfg.baseNodes
+	gNodes := cfg.BaseNodes
 	nid := len(gNodes) + 1
 	for _, s := range cfg.Nodes {
 		nodes, err := ParseChainNode(s)
@@ -73,7 +73,7 @@ func (cfg *peerConfig) Reload(r io.Reader) error {
 	}
 
 	nodes := group.SetNodes(gNodes...)
-	for _, node := range nodes[len(cfg.baseNodes):] {
+	for _, node := range nodes[len(cfg.BaseNodes):] {
 		if node.Bypass != nil {
 			node.Bypass.Stop() // clear the old nodes
 		}
@@ -82,7 +82,7 @@ func (cfg *peerConfig) Reload(r io.Reader) error {
 	return nil
 }
 
-func (cfg *peerConfig) parse(r io.Reader) error {
+func (cfg *PeerConfig) parse(r io.Reader) error {
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
 		return err
@@ -129,7 +129,7 @@ func (cfg *peerConfig) parse(r io.Reader) error {
 		case "fail_timeout":
 			cfg.FailTimeout, _ = time.ParseDuration(ss[1])
 		case "reload":
-			cfg.period, _ = time.ParseDuration(ss[1])
+			cfg.PeriodF, _ = time.ParseDuration(ss[1])
 		case "peer":
 			cfg.Nodes = append(cfg.Nodes, ss[1])
 		}
@@ -138,26 +138,26 @@ func (cfg *peerConfig) parse(r io.Reader) error {
 	return scanner.Err()
 }
 
-func (cfg *peerConfig) Period() time.Duration {
+func (cfg *PeerConfig) Period() time.Duration {
 	if cfg.Stopped() {
 		return -1
 	}
-	return cfg.period
+	return cfg.PeriodF
 }
 
 // Stop stops reloading.
-func (cfg *peerConfig) Stop() {
+func (cfg *PeerConfig) Stop() {
 	select {
-	case <-cfg.stopped:
+	case <-cfg.StoppedF:
 	default:
-		close(cfg.stopped)
+		close(cfg.StoppedF)
 	}
 }
 
-// Stopped checks whether the reloader is stopped.
-func (cfg *peerConfig) Stopped() bool {
+// Stopped checks whether the reloader is StoppedF.
+func (cfg *PeerConfig) Stopped() bool {
 	select {
-	case <-cfg.stopped:
+	case <-cfg.StoppedF:
 		return true
 	default:
 		return false
