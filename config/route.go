@@ -1,7 +1,6 @@
 package config
 
 import (
-	"crypto/sha256"
 	"crypto/tls"
 	"encoding/base64"
 	"fmt"
@@ -10,8 +9,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/far4599/gost-minimal"
 	"github.com/go-log/log"
+
+	"github.com/far4599/gost-minimal"
 )
 
 type StringList []string
@@ -138,20 +138,6 @@ func ParseChainNode(ns string) (nodes []gost.Node, err error) {
 		tr = gost.TLSTransporter()
 	case "mtls":
 		tr = gost.MTLSTransporter()
-	case "quic":
-		config := &gost.QUICConfig{
-			TLSConfig:   tlsCfg,
-			KeepAlive:   node.GetBool("keepalive"),
-			Timeout:     timeout,
-			IdleTimeout: node.GetDuration("idle"),
-		}
-
-		if cipher := node.Get("cipher"); cipher != "" {
-			sum := sha256.Sum256([]byte(cipher))
-			config.Key = sum[:]
-		}
-
-		tr = gost.QUICTransporter(config)
 	case "ohttp":
 		host = node.Get("host")
 	default:
@@ -277,19 +263,6 @@ func (r *Route) GenRouters() ([]Router, error) {
 			ln, err = gost.TLSListener(node.Addr, tlsCfg)
 		case "mtls":
 			ln, err = gost.MTLSListener(node.Addr, tlsCfg)
-		case "quic":
-			config := &gost.QUICConfig{
-				TLSConfig:   tlsCfg,
-				KeepAlive:   node.GetBool("keepalive"),
-				Timeout:     timeout,
-				IdleTimeout: node.GetDuration("idle"),
-			}
-			if cipher := node.Get("cipher"); cipher != "" {
-				sum := sha256.Sum256([]byte(cipher))
-				config.Key = sum[:]
-			}
-
-			ln, err = gost.QUICListener(node.Addr, config)
 		case "tcp":
 			ln, err = gost.TCPListener(node.Addr)
 		case "rtcp":
