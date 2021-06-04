@@ -1,6 +1,6 @@
 ## This repo was forked from https://github.com/ginuerzh/gost 
 
-This repo was forked for personal user and modified for my needs to use as local proxy for tunneling trafic via remote proxy with auth. Actually I deleted all unused protocols like udp and websockes.
+This repo was forked for personal use and modified for my needs to use as local proxy for tunneling trafic via remote proxy with auth. Actually I deleted all unused protocols like udp and websockes.
 
 Only http and socks are left.
 
